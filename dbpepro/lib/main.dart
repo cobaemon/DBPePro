@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+// AppBar
+import './DBPeProAppBar.dart';
+
+
 void main() {
   runApp(
     const MyApp()
@@ -19,40 +23,6 @@ class MyApp extends StatelessWidget {
       title: 'DB PePro',
       home: SafeArea(
         child: ConnectionScreen(),
-      ),
-    );
-  }
-}
-
-
-// バー
-class DBPeProAppBar extends StatelessWidget {
-  const DBPeProAppBar({ 
-   Key? key 
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 56.0,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      decoration: BoxDecoration(color: Colors.blue[500]),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              'DB PePro',
-              style: Theme.of(
-                context
-              ).primaryTextTheme.headline6,
-            ),
-          ),
-          const IconButton(
-            icon: Icon(Icons.menu),
-            tooltip: 'Menu',
-            onPressed: null,
-          ),
-        ],
       ),
     );
   }
