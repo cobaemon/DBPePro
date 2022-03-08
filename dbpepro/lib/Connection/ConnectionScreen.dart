@@ -157,6 +157,12 @@ class ConnectionScreen extends StatefulWidget {
 }
 
 class _ConnectionScreenState extends State<ConnectionScreen> {
+  static const Color errorColor = Colors.red;
+  static const Color defaultColor = Colors.black54;
+  static const Color defaultTextColor = Colors.black;
+  static const Color successColor = Colors.lightGreen;
+  static const Color iconColor = Colors.blue;
+
   bool _isVisible = false;
   final List<String> _list = <String>[
     'PostgreSQL',
@@ -172,12 +178,12 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   final TextEditingController _controllerPort = TextEditingController();
   final TextEditingController _controllerDatabase = TextEditingController();
 
-  Color _dbTypeColor = Colors.black54;
-  Color _usernameColor = Colors.black54;
-  Color _passwordColor = Colors.black54;
-  Color _hostColor = Colors.black54;
-  Color _portColor = Colors.black54;
-  Color _databaseColor = Colors.black54;
+  late Color _dbTypeColor;
+  late Color _usernameColor;
+  late Color _passwordColor;
+  late Color _hostColor;
+  late Color _portColor;
+  late Color _databaseColor;
 
   Future<CheckConnectionResult>? _futureCheckConnectionResult;
   Future<CheckAuthorityResult>? _futureCheckAuthorityResult;
@@ -187,9 +193,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
       _controllerDBType = newValue;
 
       if (newValue == null) {
-        _dbTypeColor = Colors.red;
+        _dbTypeColor = errorColor;
       } else {
-        _dbTypeColor = Colors.black54;
+        _dbTypeColor = defaultColor;
       }
     });
   }
@@ -197,9 +203,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   void _checkUser(String? newValue) {
     setState(() {
       if (newValue == '') {
-        _usernameColor = Colors.red;
+        _usernameColor = errorColor;
       } else {
-        _usernameColor = Colors.black54;
+        _usernameColor = defaultColor;
       }
     });
   }
@@ -207,9 +213,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   void _checkPassword(String? newValue) {
     setState(() {
       if (newValue == '') {
-        _passwordColor = Colors.red;
+        _passwordColor = errorColor;
       } else {
-        _passwordColor = Colors.black54;
+        _passwordColor = defaultColor;
       }
     });
   }
@@ -217,9 +223,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   void _checkHost(String? newValue) {
     setState(() {
       if (newValue == '') {
-        _hostColor = Colors.red;
+        _hostColor = errorColor;
       } else {
-        _hostColor = Colors.black54;
+        _hostColor = defaultColor;
       }
     });
   }
@@ -227,9 +233,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   void _checkPort(String? newValue) {
     setState(() {
       if (newValue == '') {
-        _portColor = Colors.red;
+        _portColor = errorColor;
       } else {
-        _portColor = Colors.black54;
+        _portColor = defaultColor;
       }
     });
   }
@@ -237,11 +243,22 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   void _checkDatabase(String? newValue) {
     setState(() {
       if (newValue == '') {
-        _databaseColor = Colors.red;
+        _databaseColor = errorColor;
       } else {
-        _databaseColor = Colors.black54;
+        _databaseColor = defaultColor;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dbTypeColor = defaultColor;
+    _usernameColor = defaultColor;
+    _passwordColor = defaultColor;
+    _hostColor = defaultColor;
+    _portColor = defaultColor;
+    _databaseColor = defaultColor;
   }
 
   @override
@@ -284,7 +301,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       maxLength: 64,
                       cursorHeight: 20,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: defaultTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -309,7 +326,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       maxLength: 64,
                       cursorHeight: 20,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: defaultTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -335,7 +352,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       maxLength: 64,
                       cursorHeight: 20,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: defaultTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -360,7 +377,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       maxLength: 5,
                       cursorHeight: 20,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: defaultTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -389,7 +406,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       maxLength: 64,
                       cursorHeight: 20,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: defaultTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -445,15 +462,16 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                                           snapshot.data!.result,
                                           style: TextStyle(
                                             color: (snapshot.data!.code == 1) 
-                                              ? Colors.lightGreen
-                                              : Colors.red
+                                              ? successColor
+                                              : errorColor
+
                                           ),
                                         );
                                       } else if (snapshot.hasError) {
                                         return Text(
                                           '${snapshot.error}',
                                           style: const TextStyle(
-                                            color: Colors.red,
+                                            color: errorColor,
                                           ),
                                         );
                                       }
@@ -465,14 +483,14 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                             return Text(
                               snapshot.data!.result,
                               style: const TextStyle(
-                                color: Colors.red
+                                color: errorColor,
                               ),
                             );
                           } else if (snapshot.hasError) {
                             return Text(
                               '${snapshot.error}',
                               style: const TextStyle(
-                                color: Colors.red,
+                                color: errorColor,
                               ),
                             );
                           }
@@ -486,28 +504,28 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                 margin: const EdgeInsets.all(16.0),
                 child: IconButton(
                   icon: const Icon(Icons.navigate_next),
-                  color: Colors.blue,
+                  color: iconColor,
                   iconSize: 50,
                   tooltip: 'Connection',
                   onPressed: () {
                     setState(() {
                       if (_controllerDBType == null) {
-                        _dbTypeColor = Colors.red;
+                        _dbTypeColor = errorColor;
                       }
                       if (_controllerUser.text == '') {
-                        _usernameColor = Colors.red;
+                        _usernameColor = errorColor;
                       }
                       if (_controllerPassword.text == '') {
-                        _passwordColor = Colors.red;
+                        _passwordColor = errorColor;
                       }
                       if (_controllerHost.text == '') {
-                        _hostColor = Colors.red;
+                        _hostColor = errorColor;
                       }
                       if (_controllerPort.text == '') {
-                        _portColor = Colors.red;
+                        _portColor = errorColor;
                       }
                       if (_controllerDatabase.text == '') {
-                        _databaseColor = Colors.red;
+                        _databaseColor = errorColor;
                       }
 
                       _futureCheckConnectionResult = _checkConnection(

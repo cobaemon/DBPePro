@@ -306,6 +306,10 @@ class AuthoritySelectionScreen extends StatefulWidget {
 }
 
 class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
+  static const Color errorColor = Colors.red;
+  static const Color successColor = Colors.lightGreen;
+  static const Color iconColor = Colors.blue;
+
   bool _isVisibleAuthority = false;
   bool _isVisibleAddAuthorityResult = false;
   bool _isVisibleRemoveAuthorityResult = false;
@@ -376,7 +380,7 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                 margin: const EdgeInsets.all(16.0),
                 child: IconButton(
                   icon: const Icon(Icons.navigate_before),
-                  color: Colors.blue,
+                  color: iconColor,
                   iconSize: 50,
                   tooltip: 'Back',
                   onPressed: () {
@@ -407,21 +411,21 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                                 return Text(
                                   snapshot.data!.result,
                                   style: const TextStyle(
-                                    color: Colors.red,
+                                    color: errorColor,
                                   ),
                                 );
                               }
                               return Text(
                                 snapshot.data!.result,
                                 style: const TextStyle(
-                                  color: Colors.lightGreen,
+                                  color: successColor,
                                 ),
                               );
                             } else if (snapshot.hasError) {
                               return Text(
                                 '${snapshot.error}',
                                 style: const TextStyle(
-                                  color: Colors.red,
+                                  color: errorColor,
                                 ),
                               );
                             }
@@ -452,21 +456,21 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                                 return Text(
                                   snapshot.data!.result,
                                   style: const TextStyle(
-                                    color: Colors.red,
+                                    color: errorColor,
                                   ),
                                 );
                               }
                               return Text(
                                 snapshot.data!.result,
                                 style: const TextStyle(
-                                  color: Colors.lightGreen,
+                                  color: successColor,
                                 ),
                               );
                             } else if (snapshot.hasError) {
                               return Text(
                                 '${snapshot.error}',
                                 style: const TextStyle(
-                                  color: Colors.red,
+                                  color: errorColor,
                                 ),
                               );
                             }
@@ -484,7 +488,7 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                       margin: const EdgeInsets.all(16.0),
                       child: IconButton(
                         icon: const Icon(Icons.remove),
-                        color: Colors.blue,
+                        color: iconColor,
                         iconSize: 50,
                         tooltip: 'REVOKE',
                         onPressed: () {
@@ -511,7 +515,7 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                       margin: const EdgeInsets.all(16.0),
                       child: IconButton(
                         icon: const Icon(Icons.add),
-                        color: Colors.blue,
+                        color: iconColor,
                         iconSize: 50,
                         tooltip: 'GRANT',
                         onPressed: () {

@@ -167,22 +167,26 @@ class TargetSelectionScreen extends StatefulWidget {
 }
 
 class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
+  static const Color errorColor = Colors.red;
+  static const Color defaultColor = Colors.black54;
+  static const Color iconColor = Colors.blue;
+
   bool _isVisible = false;
   late Future<TargetUserListResult> _futureTargetUserListResult;
   String? _controllerTargetUser;
-  Color _targetUserColor = Colors.black54;
+  Color _targetUserColor = defaultColor;
   late Future<TableListResult> _futureTableListResult;
   String? _controllerTable;
-  Color _tableColor = Colors.black54;
+  Color _tableColor = defaultColor;
 
   void _handleTargetUserChange(String? newValue) {
     setState(() {
       _controllerTargetUser = newValue;
 
       if (newValue == null) {
-        _targetUserColor = Colors.red;
+        _targetUserColor = errorColor;
       } else {
-        _targetUserColor = Colors.black54;
+        _targetUserColor = defaultColor;
       }
     });
   }
@@ -192,9 +196,9 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
       _controllerTable = newValue;
 
       if (newValue == null) {
-        _tableColor = Colors.red;
+        _tableColor = errorColor;
       } else {
-        _tableColor = Colors.black54;
+        _tableColor = defaultColor;
       }
     });
   }
@@ -317,7 +321,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                 margin: const EdgeInsets.all(16.0),
                 child: IconButton(
                   icon: const Icon(Icons.navigate_before),
-                  color: Colors.blue,
+                  color: iconColor,
                   iconSize: 50,
                   tooltip: 'Back',
                   onPressed: () {
@@ -358,7 +362,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                         return Text(
                                           snapshot.data!.result.first.name,
                                           style: const TextStyle(
-                                            color:Colors.red
+                                            color: errorColor,
                                           ),
                                         );
                                       }
@@ -368,7 +372,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                       return Text(
                                         '${snapshot.error}',
                                         style: const TextStyle(
-                                          color: Colors.red,
+                                          color: errorColor,
                                         ),
                                       );
                                     }
@@ -381,7 +385,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                             return Text(
                               snapshot.data!.result.first.name,
                               style: const TextStyle(
-                                color: Colors.red
+                                color: errorColor,
                               ),
                             );
                           }
@@ -389,7 +393,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                           return Text(
                             '${snapshot.error}',
                             style: const TextStyle(
-                              color: Colors.red,
+                              color: errorColor,
                             ),
                           );
                         }
@@ -404,16 +408,16 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                   margin: const EdgeInsets.all(16.0),
                   child: IconButton(
                     icon: const Icon(Icons.navigate_next),
-                    color: Colors.blue,
+                    color: iconColor,
                     iconSize: 50,
                     tooltip: 'Next Authority Select',
                     onPressed: () {
                       setState(() {
                         if (_controllerTargetUser == null) {
-                          _targetUserColor = Colors.red;
+                          _targetUserColor = errorColor;
                         }
                         if (_controllerTable == null) {
-                          _tableColor = Colors.red;
+                          _tableColor = errorColor;
                         }
 
                         if (_controllerTargetUser != null && _controllerTable != null) {
