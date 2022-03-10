@@ -167,7 +167,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   final List<String> _list = <String>[
     'PostgreSQL',
     'MySQL',
-    // 'Oracle',
+    'Oracle',
     // 'Microsoft SQL Server',
   ];
 
