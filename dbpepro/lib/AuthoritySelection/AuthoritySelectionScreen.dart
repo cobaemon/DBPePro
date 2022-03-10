@@ -50,6 +50,8 @@ Future<AuthorityListResult> _getAuthorityList(
   String host,
   String port,
   String database,
+  String targetUser,
+  String table,
 ) async {
   final response = await http.post(
     Uri.parse('http://127.0.0.1:8000/authority_list'),
@@ -63,6 +65,8 @@ Future<AuthorityListResult> _getAuthorityList(
       'host': host,
       'port': port,
       'database': database,
+      'target_user': targetUser,
+      'table': table,
     }),
   );
 
@@ -344,6 +348,8 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
       widget.host,
       widget.port,
       widget.database,
+      widget.targetUser,
+      widget.table,
     );
   }
 
