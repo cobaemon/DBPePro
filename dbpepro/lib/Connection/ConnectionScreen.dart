@@ -168,7 +168,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
     'PostgreSQL',
     'MySQL',
     'Oracle',
-    // 'Microsoft SQL Server',
+    'Microsoft SQL Server',
   ];
 
   String? _controllerDBType;
