@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 // AppBar
 import '../DBPeProAppBar.dart';
 
+String apiUri = 'http://127.0.0.1:8000';
 
 class Authority {
   const Authority({required this.authority});
@@ -54,7 +55,7 @@ Future<AuthorityListResult> _getAuthorityList(
   String table,
 ) async {
   final response = await http.post(
-    Uri.parse('http://127.0.0.1:8000/authority_list'),
+    Uri.parse(apiUri+'/authority_list'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
@@ -177,7 +178,7 @@ Future<AddAuthorityResult> _addAuthority(
     }
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/add_authority'),
+      Uri.parse(apiUri+'/add_authority'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
@@ -253,7 +254,7 @@ Future<RemoveAuthorityResult> _removeAuthority(
     }
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/remove_authority'),
+      Uri.parse(apiUri+'/remove_authority'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },

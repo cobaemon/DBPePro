@@ -11,6 +11,7 @@ import '../DBPeProAppBar.dart';
 // 対象選択画面
 import '../TargetSelection/TargetSelectionScreen.dart';
 
+String apiUri = 'http://127.0.0.1:8000';
 
 class CheckConnectionResult {
   final int code;
@@ -42,7 +43,7 @@ Future<CheckConnectionResult> _checkConnection(
 
   if (dbType != null && [user, password, host, port, database].every((e) => e != '')){
     response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/connection_check'),
+      Uri.parse(apiUri+'/connection_check'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
@@ -101,7 +102,7 @@ Future<CheckAuthorityResult> _checkAuthority(
 
   if (dbType != null && [user, password, host, port, database].every((e) => e != '')){
     response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/check_authority'),
+      Uri.parse(apiUri+'/check_authority'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },

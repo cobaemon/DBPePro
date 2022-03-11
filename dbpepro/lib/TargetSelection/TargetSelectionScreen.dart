@@ -10,6 +10,8 @@ import '../DBPeProAppBar.dart';
 // 権限選択画面
 import '../AuthoritySelection/AuthoritySelectionScreen.dart';
 
+String apiUri = 'http://127.0.0.1:8000';
+
 class TargetUser {
   const TargetUser({required this.name});
 
@@ -53,7 +55,7 @@ Future<TargetUserListResult> _getTargetUserList(
   String database,
 ) async {
   final response = await http.post(
-    Uri.parse('http://127.0.0.1:8000/target_user_list'),
+    Uri.parse(apiUri+'/target_user_list'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
@@ -120,7 +122,7 @@ Future<TableListResult> _getTableList(
   String database,
 ) async {
   final response = await http.post(
-    Uri.parse('http://127.0.0.1:8000/table_list'),
+    Uri.parse(apiUri+'/table_list'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
