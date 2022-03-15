@@ -10,15 +10,9 @@ import '../DBPeProAppBar.dart';
 
 String apiUri = 'http://127.0.0.1:8000';
 
-class Authority {
-  const Authority({required this.authority});
-
-  final String authority;
-}
-
 class AuthorityListResult {
   final int code;
-  final List<Authority> result;
+  final List<String> result;
 
   const AuthorityListResult({
     required this.code,
@@ -26,11 +20,11 @@ class AuthorityListResult {
   });
 
   factory AuthorityListResult.fromJson(Map<String, dynamic> json) {
-    List<Authority> createList(String result) {
-      List<Authority> authorityList = [];
+    List<String> createList(String result) {
+      List<String> authorityList = [];
 
       for (String authority in result.split(',')) {
-        authorityList.add(Authority(authority: authority));
+        authorityList.add(authority);
       }
 
       return authorityList;
@@ -77,11 +71,11 @@ Future<AuthorityListResult> _getAuthorityList(
     );
     return result;
   } else {
-    return const AuthorityListResult(code: 2, result: [Authority(authority: 'API is not responding.')]);
+    return const AuthorityListResult(code: 2, result: ['API is not responding.']);
   }
 }
 
-typedef AuthoritySelectionChangedCallback = Function(Authority authority, bool selection);
+typedef AuthoritySelectionChangedCallback = Function(String authority, bool selection);
 
 class AuthorityListItem extends StatelessWidget {
   AuthorityListItem({
@@ -90,7 +84,7 @@ class AuthorityListItem extends StatelessWidget {
     required this.onSelectionChanged,
   }) : super(key: ObjectKey(authority));
 
-  final Authority authority;
+  final String authority;
   final bool selection;
   final AuthoritySelectionChangedCallback onSelectionChanged;
 
@@ -124,7 +118,7 @@ class AuthorityListItem extends StatelessWidget {
           onSelectionChanged(authority, selection);
         },
         title: Text(
-          authority.authority,
+          authority,
           style: _getTextStyle(context),
         ),
       )
@@ -159,18 +153,18 @@ Future<AddAuthorityResult> _addAuthority(
   String database,
   String targetUser,
   String table,
-  List<Authority> authorityList,
+  List<String> authorityList,
 ) async {
   if (authorityList.isNotEmpty) {
-    String _createAuthority(List<Authority> authorityList) {
+    String _createAuthority(List<String> authorityList) {
       String authority = '';
 
-      for (Authority auth in authorityList) {
+      for (String auth in authorityList) {
         if (authority == '') {
-          authority = auth.authority;
+          authority = auth;
         } else {
           authority += ',';
-          authority += auth.authority;
+          authority += auth;
         }
       }
 
@@ -235,18 +229,18 @@ Future<RemoveAuthorityResult> _removeAuthority(
   String database,
   String targetUser,
   String table,
-  List<Authority> authorityList,
+  List<String> authorityList,
 ) async {
   if (authorityList.isNotEmpty) {
-    String _createAuthority(List<Authority> authorityList) {
+    String _createAuthority(List<String> authorityList) {
       String authority = '';
 
-      for (Authority auth in authorityList) {
+      for (String auth in authorityList) {
         if (authority == '') {
-          authority = auth.authority;
+          authority = auth;
         } else {
           authority += ',';
-          authority += auth.authority;
+          authority += auth;
         }
       }
 
@@ -319,11 +313,11 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
   bool _isVisibleAddAuthorityResult = false;
   bool _isVisibleRemoveAuthorityResult = false;
   late Future<AuthorityListResult> _futureAuthorityListResult;
-  final _authoritySelection = <Authority>{};
+  final _authoritySelection = <String>{};
   Future<AddAuthorityResult>? _futureAddAuthorityResult;
   Future<RemoveAuthorityResult>? _futureRemoveAuthorityResult;
 
-  void _handleSelectionChanged(Authority authority, bool selection) {
+  void _handleSelectionChanged(String authority, bool selection) {
     setState(() {
       if (selection) {
         _authoritySelection.add(authority);
@@ -368,7 +362,7 @@ class _AuthoritySelectionScreenState extends State<AuthoritySelectionScreen> {
                   return ListView(
                     children: [
                       if (snapshot.data != null && snapshot.data!.code == 1)
-                        for (Authority authority in snapshot.data!.result)
+                        for (String authority in snapshot.data!.result)
                           AuthorityListItem(
                             authority: authority,
                             selection: !_authoritySelection.contains(authority),
