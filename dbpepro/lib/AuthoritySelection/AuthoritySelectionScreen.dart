@@ -204,7 +204,7 @@ Future<AddAuthorityResult> _addAuthority(
       return const AddAuthorityResult(code: 2, result: 'API is not responding.');
     }
   } else {
-    return const AddAuthorityResult(code: 2, result: 'Please select one or more authorizations to be granted');
+    return const AddAuthorityResult(code: 2, result: 'Please select one or more revocation authorizations');
   }
 }
 
