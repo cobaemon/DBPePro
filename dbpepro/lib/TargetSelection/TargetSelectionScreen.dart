@@ -12,40 +12,34 @@ import '../AuthoritySelection/AuthoritySelectionScreen.dart';
 
 String apiUri = 'http://127.0.0.1:8000';
 
-class TargetUser {
-  const TargetUser({required this.name});
-
-  final String name;
-}
-
-class TargetUserListResult {
+class APIResult {
   final int code;
-  final List<TargetUser> result;
+  final List<String> result;
 
-  const TargetUserListResult({
+  const APIResult({
     required this.code,
     required this.result,
   });
 
-  factory TargetUserListResult.fromJson(Map<String, dynamic> json) {
-    List<TargetUser> createList(String result) {
-      List<TargetUser> targetUser = [];
+  factory APIResult.fromJson(Map<String, dynamic> json) {
+    List<String> createList(String result) {
+      List<String> targetUser = [];
 
       for (String target in result.split(',')) {
-        targetUser.add(TargetUser(name: target));
+        targetUser.add(target);
       }
 
       return targetUser;
     }
     
-    return TargetUserListResult(
+    return APIResult(
       code: json['code'],
       result: createList(json['result']),
     );
   }
 }
 
-Future<TargetUserListResult> _getTargetUserList(
+Future<APIResult> _getTargetUserList(
   BuildContext context,
   String dbType,
   String user,
@@ -70,49 +64,16 @@ Future<TargetUserListResult> _getTargetUserList(
   );
 
   if (response.statusCode == 200) {
-    TargetUserListResult result = TargetUserListResult.fromJson(
+    APIResult result = APIResult.fromJson(
       jsonDecode(response.body)
     );
     return result;
   } else {
-    return const TargetUserListResult(code: 2, result: [TargetUser(name: 'API is not responding.')]);
+    return const APIResult(code: 2, result: ['API is not responding.']);
   }
 }
 
-class Table {
-  const Table({required this.name});
-
-  final String name;
-}
-
-class TableListResult {
-  final int code;
-  final List<Table> result;
-
-  const TableListResult({
-    required this.code,
-    required this.result,
-  });
-
-  factory TableListResult.fromJson(Map<String, dynamic> json) {
-    List<Table> createList(String result) {
-      List<Table> tableList = [];
-
-      for (String table in result.split(',')) {
-        tableList.add(Table(name: table));
-      }
-
-      return tableList;
-    }
-    
-    return TableListResult(
-      code: json['code'],
-      result: createList(json['result']),
-    );
-  }
-}
-
-Future<TableListResult> _getTableList(
+Future<APIResult> _getTableList(
   BuildContext context,
   String dbType,
   String user,
@@ -137,12 +98,12 @@ Future<TableListResult> _getTableList(
   );
 
   if (response.statusCode == 200) {
-    TableListResult result = TableListResult.fromJson(
+    APIResult result = APIResult.fromJson(
       jsonDecode(response.body)
     );
     return result;
   } else {
-    return const TableListResult(code: 2, result: [Table(name: 'API is not responding.')]);
+    return const APIResult(code: 2, result: ['API is not responding.']);
   }
 }
 
@@ -174,10 +135,10 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
   static const Color iconColor = Colors.blue;
 
   bool _isVisible = false;
-  late Future<TargetUserListResult> _futureTargetUserListResult;
+  late Future<APIResult> _futureTargetUserListResult;
   String? _controllerTargetUser;
   Color _targetUserColor = defaultColor;
-  late Future<TableListResult> _futureTableListResult;
+  late Future<APIResult> _futureTableListResult;
   String? _controllerTable;
   Color _tableColor = defaultColor;
 
@@ -238,7 +199,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
             child: SizedBox(
               child: ListView(
                 children: [
-                  FutureBuilder<TargetUserListResult>(
+                  FutureBuilder<APIResult>(
                     future: _futureTargetUserListResult,
                     builder: (context, snapshot) {
                       if (snapshot.data != null && snapshot.data!.code == 1) {
@@ -254,10 +215,10 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                             onChanged: _handleTargetUserChange,
                             isExpanded: true,
                             items: snapshot.data!.result.map<DropdownMenuItem<String>>(
-                              (TargetUser targetUser) {
+                              (String targetUser) {
                                 return DropdownMenuItem<String>(
-                                  value: targetUser.name,
-                                  child: Text(targetUser.name),
+                                  value: targetUser,
+                                  child: Text(targetUser),
                                 );
                               }
                             ).toList(),
@@ -275,7 +236,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                       );
                     },
                   ),
-                  FutureBuilder<TableListResult>(
+                  FutureBuilder<APIResult>(
                     future: _futureTableListResult,
                     builder: (context, snapshot) {
                       if (snapshot.data != null && snapshot.data!.code == 1) {
@@ -291,10 +252,10 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                             onChanged: _handleTableChange,
                             isExpanded: true,
                             items: snapshot.data!.result.map<DropdownMenuItem<String>>(
-                              (Table table) {
+                              (String table) {
                                 return DropdownMenuItem<String>(
-                                  value: table.name,
-                                  child: Text(table.name),
+                                  value: table,
+                                  child: Text(table),
                                 );
                               }
                             ).toList(),
@@ -335,7 +296,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
               ),
               Container(
                 margin: const EdgeInsets.all(16.0),
-                child: FutureBuilder<TargetUserListResult>(
+                child: FutureBuilder<APIResult>(
                   future: _futureTargetUserListResult,
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
@@ -348,7 +309,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                       case ConnectionState.done:
                         if (snapshot.data != null) {
                           if (snapshot.data!.code == 1){
-                            return FutureBuilder<TableListResult>(
+                            return FutureBuilder<APIResult>(
                               future: _futureTableListResult,
                               builder: (context, snapshot) {
                                 switch (snapshot.connectionState) {
@@ -362,7 +323,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                     if (snapshot.data != null) {
                                       if (snapshot.data!.code == 2) {
                                         return Text(
-                                          snapshot.data!.result.first.name,
+                                          snapshot.data!.result.first,
                                           style: const TextStyle(
                                             color: errorColor,
                                           ),
@@ -385,7 +346,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                           }
                           if (snapshot.data!.code == 2) {
                             return Text(
-                              snapshot.data!.result.first.name,
+                              snapshot.data!.result.first,
                               style: const TextStyle(
                                 color: errorColor,
                               ),
