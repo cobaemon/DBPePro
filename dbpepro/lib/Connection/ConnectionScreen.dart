@@ -13,24 +13,24 @@ import '../TargetSelection/TargetSelectionScreen.dart';
 
 String apiUri = 'http://127.0.0.1:8000';
 
-class CheckConnectionResult {
+class APIResult {
   final int code;
   final String result;
 
-  const CheckConnectionResult({
+  const APIResult({
     required this.code,
     required this.result,
   });
 
-  factory CheckConnectionResult.fromJson(Map<String, dynamic> json) {
-    return CheckConnectionResult(
+  factory APIResult.fromJson(Map<String, dynamic> json) {
+    return APIResult(
       code: json['code'],
       result: json['result'],
     );
   }
 }
 
-Future<CheckConnectionResult> _checkConnection(
+Future<APIResult> _checkConnection(
   BuildContext context,
   String? dbType,
   String user,
@@ -59,37 +59,20 @@ Future<CheckConnectionResult> _checkConnection(
   }
 
   if (response == null) {
-    return const CheckConnectionResult(code: 3, result: 'There are fields that have not been filled in.');
+    return const APIResult(code: 3, result: 'There are fields that have not been filled in.');
   } else {
     if (response.statusCode == 200) {
-      CheckConnectionResult result = CheckConnectionResult.fromJson(
+      APIResult result = APIResult.fromJson(
         jsonDecode(response.body)
       );
       return result;
     } else {
-      return const CheckConnectionResult(code: 2, result: 'API is not responding.');
+      return const APIResult(code: 2, result: 'API is not responding.');
     }
   }
 }
 
-class CheckAuthorityResult {
-  final int code;
-  final String result;
-
-  const CheckAuthorityResult({
-    required this.code,
-    required this.result,
-  });
-
-  factory CheckAuthorityResult.fromJson(Map<String, dynamic> json) {
-    return CheckAuthorityResult(
-      code: json['code'],
-      result: json['result'],
-    );
-  }
-}
-
-Future<CheckAuthorityResult> _checkAuthority(
+Future<APIResult> _checkAuthority(
   BuildContext context,
   String? dbType,
   String user,
@@ -118,10 +101,10 @@ Future<CheckAuthorityResult> _checkAuthority(
   }
 
   if (response == null) {
-    return const CheckAuthorityResult(code: 3, result: 'There are fields that have not been filled in.');
+    return const APIResult(code: 3, result: 'There are fields that have not been filled in.');
   } else {
     if (response.statusCode == 200) {
-      CheckAuthorityResult result = CheckAuthorityResult.fromJson(
+      APIResult result = APIResult.fromJson(
         jsonDecode(response.body)
       );
       if (result.code == 1) {
@@ -143,7 +126,7 @@ Future<CheckAuthorityResult> _checkAuthority(
       }
       return result;
     } else {
-      return const CheckAuthorityResult(code: 2, result: 'API is not responding.');
+      return const APIResult(code: 2, result: 'API is not responding.');
     }
   }
 }
@@ -197,8 +180,8 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   String? _controllerDBType;
   late Color _dbTypeColor;
 
-  Future<CheckConnectionResult>? _futureCheckConnectionResult;
-  Future<CheckAuthorityResult>? _futureCheckAuthorityResult;
+  Future<APIResult>? _futureCheckConnectionResult;
+  Future<APIResult>? _futureCheckAuthorityResult;
 
   void _handleChange(String? newValue) {
     setState(() {
@@ -297,7 +280,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                 visible: _isVisible,
                 child: Container(
                   margin: const EdgeInsets.all(16.0),
-                  child: FutureBuilder<CheckConnectionResult>(
+                  child: FutureBuilder<APIResult>(
                     future: _futureCheckConnectionResult,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
@@ -310,7 +293,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                         case ConnectionState.done:
                           if (snapshot.hasData) {
                             if (snapshot.data!.code == 1){
-                              return FutureBuilder<CheckAuthorityResult>(
+                              return FutureBuilder<APIResult>(
                                 future: _futureCheckAuthorityResult,
                                 builder: (context, snapshot) {
                                   switch (snapshot.connectionState) {
