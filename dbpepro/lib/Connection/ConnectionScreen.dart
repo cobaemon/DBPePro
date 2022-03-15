@@ -158,11 +158,33 @@ class ConnectionScreen extends StatefulWidget {
 }
 
 class _ConnectionScreenState extends State<ConnectionScreen> {
-  static const Color errorColor = Colors.red;
   static const Color defaultColor = Colors.black54;
-  static const Color defaultTextColor = Colors.black;
+  static const Color errorColor = Colors.red;
   static const Color successColor = Colors.lightGreen;
+  static const Color defaultTextColor = Colors.black;
   static const Color iconColor = Colors.blue;
+
+  final List<String> _textFieldLabel = [
+    'Username',
+    'Password',
+    'Host',
+    'Port',
+    'Database',
+  ];
+  final Map<String, TextEditingController> _textFieldController = {
+    'Username': TextEditingController(),
+    'Password': TextEditingController(),
+    'Host': TextEditingController(),
+    'Port': TextEditingController(),
+    'Database': TextEditingController(),
+  };
+  late final Map<String, Color> _textFieldColor = {
+    'Username': defaultColor,
+    'Password': defaultColor,
+    'Host': defaultColor,
+    'Port': defaultColor,
+    'Database': defaultColor,
+  };
 
   bool _isVisible = false;
   final List<String> _list = <String>[
@@ -173,18 +195,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   ];
 
   String? _controllerDBType;
-  final TextEditingController _controllerUser = TextEditingController();
-  final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerHost = TextEditingController();
-  final TextEditingController _controllerPort = TextEditingController();
-  final TextEditingController _controllerDatabase = TextEditingController();
-
   late Color _dbTypeColor;
-  late Color _usernameColor;
-  late Color _passwordColor;
-  late Color _hostColor;
-  late Color _portColor;
-  late Color _databaseColor;
 
   Future<CheckConnectionResult>? _futureCheckConnectionResult;
   Future<CheckAuthorityResult>? _futureCheckAuthorityResult;
@@ -201,65 +212,10 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
     });
   }
 
-  void _checkUser(String? newValue) {
-    setState(() {
-      if (newValue == '') {
-        _usernameColor = errorColor;
-      } else {
-        _usernameColor = defaultColor;
-      }
-    });
-  }
-
-  void _checkPassword(String? newValue) {
-    setState(() {
-      if (newValue == '') {
-        _passwordColor = errorColor;
-      } else {
-        _passwordColor = defaultColor;
-      }
-    });
-  }
-
-  void _checkHost(String? newValue) {
-    setState(() {
-      if (newValue == '') {
-        _hostColor = errorColor;
-      } else {
-        _hostColor = defaultColor;
-      }
-    });
-  }
-
-  void _checkPort(String? newValue) {
-    setState(() {
-      if (newValue == '') {
-        _portColor = errorColor;
-      } else {
-        _portColor = defaultColor;
-      }
-    });
-  }
-
-  void _checkDatabase(String? newValue) {
-    setState(() {
-      if (newValue == '') {
-        _databaseColor = errorColor;
-      } else {
-        _databaseColor = defaultColor;
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     _dbTypeColor = defaultColor;
-    _usernameColor = defaultColor;
-    _passwordColor = defaultColor;
-    _hostColor = defaultColor;
-    _portColor = defaultColor;
-    _databaseColor = defaultColor;
   }
 
   @override
@@ -293,136 +249,43 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       ).toList(),
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      enabled: true,
-                      controller: _controllerUser,
-                      onChanged: _checkUser,
-                      maxLength: 64,
-                      cursorHeight: 20,
-                      style: const TextStyle(
-                        color: defaultTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: _usernameColor,
-                          ),
+                  for (String label in _textFieldLabel)
+                    Container(
+                      margin: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        enabled: true,
+                        controller: _textFieldController[label],
+                        onChanged: (String newValue) {
+                          setState(() {
+                            if (newValue == '') {
+                              _textFieldColor[label] = errorColor;
+                            } else {
+                              _textFieldColor[label] = defaultColor;
+                            }
+                          });
+                        },
+                        maxLength: 64,
+                        cursorHeight: 20,
+                        style: const TextStyle(
+                          color: defaultTextColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
                         ),
-                        labelText: 'Username',
-                      ),
-                      maxLines: 1,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      enabled: true,
-                      controller: _controllerPassword,
-                      onChanged: _checkPassword,
-                      maxLength: 64,
-                      cursorHeight: 20,
-                      style: const TextStyle(
-                        color: defaultTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: _passwordColor,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: _textFieldColor[label]!,
+                            ),
                           ),
+                          labelText: label,
                         ),
-                        labelText: 'Password',
+                        maxLines: 1,
+                        obscureText: (label == 'Password') ? true : false,
+                        keyboardType: (label == 'Port') ? TextInputType.number : TextInputType.text,
+                        inputFormatters: (label == 'Port') ? [FilteringTextInputFormatter.digitsOnly] : [],
                       ),
-                      maxLines: 1,
-                      obscureText: true,
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      enabled: true,
-                      controller: _controllerHost,
-                      onChanged: _checkHost,
-                      maxLength: 64,
-                      cursorHeight: 20,
-                      style: const TextStyle(
-                        color: defaultTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: _hostColor,
-                          ),
-                        ),
-                        labelText: 'Host',
-                      ),
-                      maxLines: 1,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      enabled: true,
-                      controller: _controllerPort,
-                      onChanged: _checkPort,
-                      maxLength: 5,
-                      cursorHeight: 20,
-                      style: const TextStyle(
-                        color: defaultTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: _portColor,
-                          ),
-                        ),
-                        labelText: 'Port',
-                      ),
-                      maxLines: 1,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      enabled: true,
-                      controller: _controllerDatabase,
-                      onChanged: _checkDatabase,
-                      maxLength: 64,
-                      cursorHeight: 20,
-                      style: const TextStyle(
-                        color: defaultTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: _databaseColor,
-                          ),
-                        ),
-                        labelText: 'Database',
-                      ),
-                      maxLines: 1,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -465,7 +328,6 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                                             color: (snapshot.data!.code == 1) 
                                               ? successColor
                                               : errorColor
-
                                           ),
                                         );
                                       } else if (snapshot.hasError) {
@@ -513,39 +375,28 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                       if (_controllerDBType == null) {
                         _dbTypeColor = errorColor;
                       }
-                      if (_controllerUser.text == '') {
-                        _usernameColor = errorColor;
+                      for (String label in _textFieldLabel) {
+                        if (_textFieldController[label]!.text == '') {
+                          _textFieldColor[label] = errorColor;
+                        }
                       }
-                      if (_controllerPassword.text == '') {
-                        _passwordColor = errorColor;
-                      }
-                      if (_controllerHost.text == '') {
-                        _hostColor = errorColor;
-                      }
-                      if (_controllerPort.text == '') {
-                        _portColor = errorColor;
-                      }
-                      if (_controllerDatabase.text == '') {
-                        _databaseColor = errorColor;
-                      }
-
                       _futureCheckConnectionResult = _checkConnection(
                         context,
                         _controllerDBType,
-                        _controllerUser.text,
-                        _controllerPassword.text,
-                        _controllerHost.text,
-                        _controllerPort.text,
-                        _controllerDatabase.text,
+                        _textFieldController['Username']!.text,
+                        _textFieldController['Password']!.text,
+                        _textFieldController['Host']!.text,
+                        _textFieldController['Port']!.text,
+                        _textFieldController['Database']!.text,
                       );
                       _futureCheckAuthorityResult = _checkAuthority(
                         context,
                         _controllerDBType,
-                        _controllerUser.text,
-                        _controllerPassword.text,
-                        _controllerHost.text,
-                        _controllerPort.text,
-                        _controllerDatabase.text,
+                        _textFieldController['Username']!.text,
+                        _textFieldController['Password']!.text,
+                        _textFieldController['Host']!.text,
+                        _textFieldController['Port']!.text,
+                        _textFieldController['Database']!.text,
                       );
                       _isVisible = true;
                     });
