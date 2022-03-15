@@ -11,6 +11,8 @@ import '../DBPeProAppBar.dart';
 import '../AuthoritySelection/AuthoritySelectionScreen.dart';
 
 String apiUri = 'http://127.0.0.1:8000';
+String targetUserUri = '/target_user_list';
+String tableUri = '/table_list';
 
 class APIResult {
   final int code;
@@ -39,8 +41,9 @@ class APIResult {
   }
 }
 
-Future<APIResult> _getTargetUserList(
+Future<APIResult> _getList(
   BuildContext context,
+  String uri,
   String dbType,
   String user,
   String password,
@@ -49,41 +52,7 @@ Future<APIResult> _getTargetUserList(
   String database,
 ) async {
   final response = await http.post(
-    Uri.parse(apiUri+'/target_user_list'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-    body: jsonEncode(<String, String>{
-      'db_type': dbType,
-      'user': user,
-      'password': password,
-      'host': host,
-      'port': port,
-      'database': database,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    APIResult result = APIResult.fromJson(
-      jsonDecode(response.body)
-    );
-    return result;
-  } else {
-    return const APIResult(code: 2, result: ['API is not responding.']);
-  }
-}
-
-Future<APIResult> _getTableList(
-  BuildContext context,
-  String dbType,
-  String user,
-  String password,
-  String host,
-  String port,
-  String database,
-) async {
-  final response = await http.post(
-    Uri.parse(apiUri+'/table_list'),
+    Uri.parse(apiUri+uri),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
@@ -130,63 +99,47 @@ class TargetSelectionScreen extends StatefulWidget {
 }
 
 class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
-  static const Color errorColor = Colors.red;
-  static const Color defaultColor = Colors.black54;
-  static const Color iconColor = Colors.blue;
+  static const Color _errorColor = Colors.red;
+  static const Color _defaultColor = Colors.black54;
+  static const Color _iconColor = Colors.blue;
 
+  final List<String> _uriList = [
+    targetUserUri,
+    tableUri,
+  ];
+  final Map<String, String> _futureBuilderText = {
+    targetUserUri: 'Select user',
+    tableUri: 'Select Table',
+  };
+  final Map<String, Color> _futureBuilderColor = {
+    targetUserUri: _defaultColor,
+    tableUri: _defaultColor,
+  };
+  final Map<String, String?> _selectList = {
+    targetUserUri: null,
+    tableUri: null,
+  };
+
+  late final Map<String, Future<APIResult>> _futureAPIResult = {};
+  
   bool _isVisible = false;
-  late Future<APIResult> _futureTargetUserListResult;
-  String? _controllerTargetUser;
-  Color _targetUserColor = defaultColor;
-  late Future<APIResult> _futureTableListResult;
-  String? _controllerTable;
-  Color _tableColor = defaultColor;
-
-  void _handleTargetUserChange(String? newValue) {
-    setState(() {
-      _controllerTargetUser = newValue;
-
-      if (newValue == null) {
-        _targetUserColor = errorColor;
-      } else {
-        _targetUserColor = defaultColor;
-      }
-    });
-  }
-
-  void _handleTableChange(String? newValue) {
-    setState(() {
-      _controllerTable = newValue;
-
-      if (newValue == null) {
-        _tableColor = errorColor;
-      } else {
-        _tableColor = defaultColor;
-      }
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    _futureTargetUserListResult = _getTargetUserList(
-      context,
-      widget.dbType,
-      widget.user,
-      widget.password,
-      widget.host,
-      widget.port,
-      widget.database,
-    );
-    _futureTableListResult = _getTableList(
-      context,
-      widget.dbType,
-      widget.user,
-      widget.password,
-      widget.host,
-      widget.port,
-      widget.database,
-    );
+    for (String uri in _uriList) {
+      _futureAPIResult[uri] = 
+        _getList(
+          context, 
+          uri, 
+          widget.dbType, 
+          widget.user, 
+          widget.password, 
+          widget.host, 
+          widget.port, 
+          widget.database,
+        );
+    }
   }
 
   @override
@@ -199,88 +152,66 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
             child: SizedBox(
               child: ListView(
                 children: [
-                  FutureBuilder<APIResult>(
-                    future: _futureTargetUserListResult,
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null && snapshot.data!.code == 1) {
+                  for (String uri in _uriList)
+                    FutureBuilder<APIResult>(
+                      future: _futureAPIResult[uri],
+                      builder: (context, snapshot) {
+                        if (snapshot.data != null && snapshot.data!.code == 1) {
+                          return Container(
+                            margin: const EdgeInsets.all(16.0),
+                            child: 
+                            DropdownButton<String>(
+                              hint: Text(_futureBuilderText[uri]!),
+                              underline: Container(
+                                height: 1,
+                                color: _futureBuilderColor[uri],
+                              ),
+                              value: _selectList[uri],
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _selectList[uri] = newValue;
+                                  if (newValue == null) {
+                                    _futureBuilderColor[uri] = _errorColor;
+                                  } else {
+                                    _futureBuilderColor[uri] = _defaultColor;
+                                  }
+                                });
+                              },
+                              isExpanded: true,
+                              items: snapshot.data!.result.map<DropdownMenuItem<String>>(
+                                (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }
+                              ).toList(),
+                            ),
+                          );
+                        }
                         return Container(
                           margin: const EdgeInsets.all(16.0),
                           child: DropdownButton<String>(
-                            hint: const Text('Select user'),
                             underline: Container(
                               height: 1,
-                              color: _targetUserColor,
+                              color: _errorColor,
                             ),
-                            value: _controllerTargetUser,
-                            onChanged: _handleTargetUserChange,
+                            value: '',
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                if (newValue == null) {
+                                  _futureBuilderColor[uri] = _errorColor;
+                                } else {
+                                  _futureBuilderColor[uri] = _defaultColor;
+                                }
+                              });
+                            },
                             isExpanded: true,
-                            items: snapshot.data!.result.map<DropdownMenuItem<String>>(
-                              (String targetUser) {
-                                return DropdownMenuItem<String>(
-                                  value: targetUser,
-                                  child: Text(targetUser),
-                                );
-                              }
-                            ).toList(),
+                            items: const [],
                           ),
                         );
-                      }
-                      return Container(
-                        margin: const EdgeInsets.all(16.0),
-                        child: DropdownButton<String>(
-                          underline: Container(
-                            height: 1,
-                            color: errorColor,
-                          ),
-                          value: '',
-                          onChanged: _handleTargetUserChange,
-                          isExpanded: true,
-                          items: const [],
-                        ),
-                      );
-                    },
-                  ),
-                  FutureBuilder<APIResult>(
-                    future: _futureTableListResult,
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null && snapshot.data!.code == 1) {
-                        return Container(
-                          margin: const EdgeInsets.all(16.0),
-                          child: DropdownButton<String>(
-                            hint: const Text('Select Table'),
-                            underline: Container(
-                              height: 1,
-                              color: _tableColor,
-                            ),
-                            value: _controllerTable,
-                            onChanged: _handleTableChange,
-                            isExpanded: true,
-                            items: snapshot.data!.result.map<DropdownMenuItem<String>>(
-                              (String table) {
-                                return DropdownMenuItem<String>(
-                                  value: table,
-                                  child: Text(table),
-                                );
-                              }
-                            ).toList(),
-                          ),
-                        );
-                      }
-                      return Container(
-                        margin: const EdgeInsets.all(16.0),
-                        child: DropdownButton<String>(
-                          underline: Container(
-                            height: 1,
-                            color: errorColor,
-                          ),
-                          value: '',
-                          onChanged: _handleTableChange,
-                          isExpanded: true,
-                          items: const [],
-                        ),
-                      );
-                    },
-                  ),
+                      },
+                    ),
                 ],
               ),
             ),
@@ -292,7 +223,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                 margin: const EdgeInsets.all(16.0),
                 child: IconButton(
                   icon: const Icon(Icons.navigate_before),
-                  color: iconColor,
+                  color: _iconColor,
                   iconSize: 50,
                   tooltip: 'Back',
                   onPressed: () {
@@ -305,7 +236,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
               Container(
                 margin: const EdgeInsets.all(16.0),
                 child: FutureBuilder<APIResult>(
-                  future: _futureTargetUserListResult,
+                  future: _futureAPIResult[targetUserUri],
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
@@ -318,7 +249,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                         if (snapshot.data != null) {
                           if (snapshot.data!.code == 1){
                             return FutureBuilder<APIResult>(
-                              future: _futureTableListResult,
+                              future: _futureAPIResult[tableUri],
                               builder: (context, snapshot) {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.none:
@@ -333,7 +264,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                         return Text(
                                           snapshot.data!.result.first,
                                           style: const TextStyle(
-                                            color: errorColor,
+                                            color: _errorColor,
                                           ),
                                         );
                                       }
@@ -343,7 +274,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                       return Text(
                                         '${snapshot.error}',
                                         style: const TextStyle(
-                                          color: errorColor,
+                                          color: _errorColor,
                                         ),
                                       );
                                     }
@@ -356,7 +287,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                             return Text(
                               snapshot.data!.result.first,
                               style: const TextStyle(
-                                color: errorColor,
+                                color: _errorColor,
                               ),
                             );
                           }
@@ -364,7 +295,7 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                           return Text(
                             '${snapshot.error}',
                             style: const TextStyle(
-                              color: errorColor,
+                              color: _errorColor,
                             ),
                           );
                         }
@@ -379,19 +310,17 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                   margin: const EdgeInsets.all(16.0),
                   child: IconButton(
                     icon: const Icon(Icons.navigate_next),
-                    color: iconColor,
+                    color: _iconColor,
                     iconSize: 50,
                     tooltip: 'Next Authority Select',
                     onPressed: () {
                       setState(() {
-                        if (_controllerTargetUser == null) {
-                          _targetUserColor = errorColor;
+                        for (String uri in _uriList) {
+                          if (_selectList[uri] == null) {
+                            _futureBuilderColor[uri] = _errorColor;
+                          }
                         }
-                        if (_controllerTable == null) {
-                          _tableColor = errorColor;
-                        }
-
-                        if (_controllerTargetUser != null && _controllerTable != null) {
+                        if (_selectList[targetUserUri] != null && _selectList[tableUri] != null) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -403,8 +332,8 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                                   host: widget.host,
                                   port: widget.port,
                                   database: widget.database,
-                                  targetUser: _controllerTargetUser!,
-                                  table: _controllerTable!,
+                                  targetUser: _selectList[targetUserUri]!,
+                                  table: _selectList[tableUri]!,
                                 );
                               }
                             ),
