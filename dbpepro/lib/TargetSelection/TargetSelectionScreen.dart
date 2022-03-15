@@ -228,6 +228,10 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                       return Container(
                         margin: const EdgeInsets.all(16.0),
                         child: DropdownButton<String>(
+                          underline: Container(
+                            height: 1,
+                            color: errorColor,
+                          ),
                           value: '',
                           onChanged: _handleTargetUserChange,
                           isExpanded: true,
@@ -265,6 +269,10 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                       return Container(
                         margin: const EdgeInsets.all(16.0),
                         child: DropdownButton<String>(
+                          underline: Container(
+                            height: 1,
+                            color: errorColor,
+                          ),
                           value: '',
                           onChanged: _handleTableChange,
                           isExpanded: true,
