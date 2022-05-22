@@ -24,11 +24,6 @@ class DBPeProAppBar extends StatelessWidget {
               ).primaryTextTheme.headline6,
             ),
           ),
-          const IconButton(
-            icon: Icon(Icons.menu),
-            tooltip: 'Menu',
-            onPressed: null,
-          ),
         ],
       ),
     );
